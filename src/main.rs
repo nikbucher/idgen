@@ -97,7 +97,7 @@ fn main() {
 	}
 
 	if !args.quiet {
-		eprintln!("|    alphabet: {:?}", args.alphabet);
+		eprintln!("|   alphabet: {:?}", args.alphabet);
 		eprintln!("| block-size: {}", args.block_size);
 		eprintln!("|  delimiter: {}", args.delimiter);
 		eprintln!("|       size: {}", args.size);
