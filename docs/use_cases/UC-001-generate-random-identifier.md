@@ -2,10 +2,10 @@
 
 ## Overview
 
-**Use Case ID:** UC-001
-**Use Case Name:** Generate Random Identifier
-**Primary Actor:** Developer
-**Goal:** Obtain one or more random identifiers with a controllable character set and output format, suitable for use in scripts, configuration, filenames, or test data
+**Use Case ID:** UC-001   
+**Use Case Name:** Generate Random Identifier   
+**Primary Actor:** Developer   
+**Goal:** Obtain one or more random identifiers with a controllable character set and output format, suitable for use in scripts, configuration, filenames, or test data   
 **Status:** Done
 
 ## Preconditions
