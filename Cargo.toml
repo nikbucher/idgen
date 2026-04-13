@@ -1,0 +1,15 @@
+[package]
+name = "idgen"
+version = "0.1.0"
+edition = "2021"
+description = "CLI tool for generating random NanoID-style identifiers"
+authors = ["Niklaus Bucher"]
+license = "MIT"
+repository = "https://github.com/nikbucher/idgen"
+readme = "README.md"
+keywords = ["nanoid", "id", "generator", "cli"]
+categories = ["command-line-utilities"]
+
+[dependencies]
+clap = { version = "4.5.28", features = ["derive"] }
+rand = "0.9.0"
