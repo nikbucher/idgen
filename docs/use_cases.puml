@@ -1,0 +1,12 @@
+@startuml Use Cases Overview
+left to right direction
+
+actor "Developer" as dev
+
+rectangle "idgen" {
+    usecase "UC-001\nGenerate random identifier" as UC001
+}
+
+dev --> UC001
+
+@enduml
