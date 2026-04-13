@@ -96,7 +96,20 @@
 
 ### BR-001: Ambiguity-safe alphabets exclude visually confusable characters
 
-Alphabets designated as ambiguity-safe must not include characters that are routinely confused by humans when reading printed or on-screen output. For `uppercase`, excluded characters are B, D, I, O, S, Z. For `lowercase`, excluded characters are 1 and l. For `uppercase-and-lowercase`, excluded characters are B, D, I, K, O, S, Z, k, l.
+Alphabets designated as ambiguity-safe must not include characters that are routinely confused by humans when reading printed or on-screen output. When one character of a confusable pair is excluded, both are excluded.
+
+| Pair  | `uppercase` | `lowercase` | `uppercase-and-lowercase` |
+|-------|-------------|-------------|---------------------------|
+| 0 ↔ O | both out    | both kept   | both out                  |
+| 0 ↔ D | both out    | n/a         | both out                  |
+| 1 ↔ I | both out    | n/a         | both out                  |
+| 1 ↔ l | n/a         | both out    | both out                  |
+| 2 ↔ Z | both out    | n/a         | both out                  |
+| 5 ↔ S | both out    | n/a         | both out                  |
+| 8 ↔ B | both out    | n/a         | both out                  |
+| K ↔ k | n/a         | n/a         | both out                  |
+
+Pairs marked n/a do not apply because one or both characters are absent from that alphabet's case range.
 
 ### BR-002: Characters are selected with uniform probability
 
