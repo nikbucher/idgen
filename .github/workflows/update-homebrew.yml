@@ -52,7 +52,7 @@ jobs:
         run: |
           cat > Formula/idgen.rb << RUBY
           class Idgen < Formula
-            desc "CLI tool for generating random NanoID-style identifiers"
+            desc "CLI for generating random identifiers with customizable alphabets and block formatting"
             homepage "https://github.com/nikbucher/idgen"
             version "$VERSION"
             license "MIT"
@@ -81,6 +81,9 @@ jobs:
 
             def install
               bin.install "idgen"
+              bash_completion.install "completions/idgen.bash" => "idgen"
+              zsh_completion.install "completions/_idgen"
+              fish_completion.install "completions/idgen.fish"
             end
 
             test do

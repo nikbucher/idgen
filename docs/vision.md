@@ -11,7 +11,7 @@ Provide developers with a fast, flexible command-line tool for generating random
 
 ## Core Features
 
-- **Alphabet selection**: Choose from multiple predefined alphabets (NanoID default, alphanumeric, ambiguity-safe uppercase/lowercase/mixed)
+- **Alphabet selection**: Choose from multiple predefined alphabets (NanoID / URL-safe Base64, alphanumeric, ambiguity-safe uppercase/lowercase/mixed)
 - **Flexible formatting**: Control ID length, block size, and delimiter to match any naming convention
 - **Batch generation**: Generate multiple IDs in a single invocation
 - **Quiet mode**: Suppress metadata output for clean pipeline integration

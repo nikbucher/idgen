@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/nikbucher/idgen/actions/workflows/ci.yml/badge.svg)](https://github.com/nikbucher/idgen/actions/workflows/ci.yml)
 
-A CLI tool for generating random [NanoID](https://github.com/ai/nanoid)-style identifiers.
+A CLI tool for generating random identifiers with customizable alphabets and block formatting.
 
 ## Install
 
@@ -63,16 +63,63 @@ idgen -q
 idgen -a all -s 32 -b 8 -d _ -n 3 -q
 ```
 
-## Options
+## Synopsis
 
-| Flag | Long           | Default     | Description                |
-|------|----------------|-------------|----------------------------|
-| `-a` | `--alphabet`   | `lowercase` | Alphabet to use            |
-| `-b` | `--block-size` | `4`         | Characters per block       |
-| `-d` | `--delimiter`  | `-`         | Delimiter between blocks   |
-| `-s` | `--size`       | `20`        | Total number of characters |
-| `-n` | `--count`      | `1`         | Number of IDs to generate  |
-| `-q` | `--quiet`      | `false`     | Suppress config output     |
+```text
+$ idgen --help
+Generate random identifiers
+
+Usage: idgen [OPTIONS]
+
+Options:
+  -a, --alphabet <ALPHABET>
+          Alphabet to use for ID generation
+
+          Possible values:
+          - nanoid:                  NanoID / URL-safe Base64: _-0-9a-zA-Z
+          - all:                     All alphanumeric: 0-9a-zA-Z
+          - uppercase:               Ambiguity-safe uppercase: excludes B, D, I, O, S, Z
+          - all-uppercase:           All uppercase: 0-9A-Z
+          - lowercase:               Ambiguity-safe lowercase: excludes 1, l
+          - all-lowercase:           All lowercase: 0-9a-z
+          - uppercase-and-lowercase: Ambiguity-safe mixed case: excludes B, D, I, K, O, S, Z, k, l
+
+          [default: lowercase]
+
+  -b, --block-size <BLOCK_SIZE>
+          Number of characters per block
+
+          [default: 4]
+
+  -d, --delimiter <DELIMITER>
+          Delimiter between blocks
+
+          [default: -]
+
+  -s, --size <SIZE>
+          Total number of characters in the generated ID
+
+          [default: 20]
+
+  -n, --count <COUNT>
+          Number of IDs to generate
+
+          [default: 1]
+
+  -q, --quiet
+          Suppress config output
+
+      --completions <SHELL>
+          Generate shell completion script and exit
+
+          [possible values: bash, elvish, fish, powershell, zsh]
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
+```
 
 ## Alphabets
 
@@ -80,13 +127,42 @@ Alphabets marked as ambiguity-safe exclude characters that look alike when read 
 
 | Name                      | Characters                           | Description                                               |
 |---------------------------|--------------------------------------|-----------------------------------------------------------|
-| `j-nano`                  | `_-0-9a-zA-Z`                        | NanoID default (64 chars)                                 |
+| `nanoid`                  | `_-0-9a-zA-Z`                        | NanoID / URL-safe Base64 (64 chars)                       |
 | `all`                     | `0-9a-zA-Z`                          | All alphanumeric (62 chars)                               |
 | `uppercase`               | `34679ACEFGHJKLMNPQRTUVWXY`          | Ambiguity-safe uppercase (excludes 0, 1, 2, 5, 8, B, D, I, O, S, Z) |
 | `all-uppercase`           | `0-9A-Z`                             | All uppercase (36 chars)                                  |
 | `lowercase`               | `023456789abcdefghijkmnopqrstuvwxyz` | Ambiguity-safe lowercase (excludes 1, l)                  |
 | `all-lowercase`           | `0-9a-z`                             | All lowercase (36 chars)                                  |
 | `uppercase-and-lowercase` | `34679ACEFGHJLMNPQRTUVWXY...`        | Ambiguity-safe mixed (excludes 0, 1, 2, 5, 8, B, D, I, K, O, S, Z, k, l) |
+
+## Shell Completions
+
+Tab completion is supported for `bash`, `zsh`, `fish`, `powershell`, and `elvish`.
+
+### Homebrew
+
+Completions for bash, zsh, and fish are installed automatically.
+
+### Manual
+
+Generate and install the completion script for your shell:
+
+```sh
+# bash (Linux)
+idgen --completions bash | sudo tee /etc/bash_completion.d/idgen
+
+# bash (macOS with Homebrew-installed bash)
+idgen --completions bash > "$(brew --prefix)/etc/bash_completion.d/idgen"
+
+# zsh — place in any directory on your $fpath
+idgen --completions zsh > "${fpath[1]}/_idgen"
+
+# fish
+idgen --completions fish > ~/.config/fish/completions/idgen.fish
+
+# PowerShell — add to $PROFILE
+idgen --completions powershell | Out-String | Invoke-Expression
+```
 
 ## Releasing
 

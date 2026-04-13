@@ -1,9 +1,10 @@
-use clap::{Parser, ValueEnum};
+use clap::{CommandFactory, Parser, ValueEnum};
+use clap_complete::Shell;
 use rand::distr::Uniform;
 use rand::Rng;
 
 #[derive(Parser)]
-#[command(name = "idgen", version, about = "Generate random NanoID-style identifiers")]
+#[command(name = "idgen", version, about = "Generate random identifiers")]
 struct IdGen {
 	/// Alphabet to use for ID generation
 	#[arg(short = 'a', long = "alphabet", default_value = "lowercase")]
@@ -28,12 +29,16 @@ struct IdGen {
 	/// Suppress config output
 	#[arg(short = 'q', long = "quiet")]
 	quiet: bool,
+
+	/// Generate shell completion script and exit
+	#[arg(long = "completions", value_name = "SHELL", value_enum)]
+	completions: Option<Shell>,
 }
 
 #[derive(Debug, Clone, ValueEnum)]
 enum Alphabet {
-	/// NanoID default: _-0-9a-zA-Z
-	JNano,
+	/// NanoID / URL-safe Base64: _-0-9a-zA-Z
+	Nanoid,
 	/// All alphanumeric: 0-9a-zA-Z
 	All,
 	/// Ambiguity-safe uppercase: excludes B, D, I, O, S, Z
@@ -51,7 +56,7 @@ enum Alphabet {
 impl Alphabet {
 	fn chars(&self) -> &str {
 		match self {
-			Alphabet::JNano => "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+			Alphabet::Nanoid => "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
 			Alphabet::All => "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
 			Alphabet::Uppercase => "34679ACEFGHJKLMNPQRTUVWXY",
 			Alphabet::AllUppercase => "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -84,6 +89,13 @@ fn format_id(id: &str, block_size: usize, delimiter: &str) -> String {
 fn main() {
 	let args = IdGen::parse();
 
+	if let Some(shell) = args.completions {
+		let mut cmd = IdGen::command();
+		let bin_name = cmd.get_name().to_string();
+		clap_complete::generate(shell, &mut cmd, bin_name, &mut std::io::stdout());
+		return;
+	}
+
 	if !args.quiet {
 		eprintln!("|    alphabet: {:?}", args.alphabet);
 		eprintln!("| block-size: {}", args.block_size);
@@ -113,7 +125,7 @@ mod tests {
 	#[test]
 	fn generate_id_uses_only_alphabet_chars() {
 		let variants = [
-			Alphabet::JNano,
+			Alphabet::Nanoid,
 			Alphabet::All,
 			Alphabet::Uppercase,
 			Alphabet::AllUppercase,
@@ -160,7 +172,7 @@ mod tests {
 	#[test]
 	fn all_alphabets_are_ascii_and_nonempty() {
 		let variants = [
-			Alphabet::JNano,
+			Alphabet::Nanoid,
 			Alphabet::All,
 			Alphabet::Uppercase,
 			Alphabet::AllUppercase,
@@ -172,6 +184,16 @@ mod tests {
 			let chars = alphabet.chars();
 			assert!(!chars.is_empty(), "{:?} is empty", alphabet);
 			assert!(chars.is_ascii(), "{:?} contains non-ASCII", alphabet);
+		}
+	}
+
+	#[test]
+	fn completions_generate_for_all_shells() {
+		for shell in [Shell::Bash, Shell::Zsh, Shell::Fish, Shell::PowerShell, Shell::Elvish] {
+			let mut cmd = IdGen::command();
+			let mut buf: Vec<u8> = Vec::new();
+			clap_complete::generate(shell, &mut cmd, "idgen", &mut buf);
+			assert!(!buf.is_empty(), "completion output empty for {shell:?}");
 		}
 	}
 }

@@ -12,7 +12,29 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  completions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build (native)
+        run: cargo build --release
+      - name: Generate completion scripts
+        run: |
+          mkdir -p completions
+          ./target/release/idgen --completions bash       > completions/idgen.bash
+          ./target/release/idgen --completions zsh        > completions/_idgen
+          ./target/release/idgen --completions fish       > completions/idgen.fish
+          ./target/release/idgen --completions powershell > completions/idgen.ps1
+          ./target/release/idgen --completions elvish     > completions/idgen.elv
+      - uses: actions/upload-artifact@v7
+        with:
+          name: idgen-completions
+          path: completions/
+
   build:
+    needs: completions
     strategy:
       matrix:
         include:
@@ -58,18 +80,28 @@ jobs:
       - name: Build
         run: cargo build --release --target ${{ matrix.target }}
 
+      - name: Download completions
+        uses: actions/download-artifact@v8
+        with:
+          name: idgen-completions
+          path: completions/
+
       - name: Package (unix)
         if: matrix.archive == 'tar.gz'
         run: |
-          cd target/${{ matrix.target }}/release
-          tar czf ../../../idgen-${{ matrix.target }}.tar.gz idgen
-          cd ../../..
+          STAGE=$(mktemp -d)
+          cp target/${{ matrix.target }}/release/idgen "$STAGE/"
+          cp -r completions "$STAGE/"
+          tar czf idgen-${{ matrix.target }}.tar.gz -C "$STAGE" .
 
       - name: Package (windows)
         if: matrix.archive == 'zip'
         shell: pwsh
         run: |
-          Compress-Archive -Path "target/${{ matrix.target }}/release/idgen.exe" -DestinationPath "idgen-${{ matrix.target }}.zip"
+          $stage = New-Item -ItemType Directory -Path (Join-Path $env:RUNNER_TEMP "stage")
+          Copy-Item "target/${{ matrix.target }}/release/idgen.exe" $stage
+          Copy-Item -Recurse "completions" $stage
+          Compress-Archive -Path "$stage/*" -DestinationPath "idgen-${{ matrix.target }}.zip"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
